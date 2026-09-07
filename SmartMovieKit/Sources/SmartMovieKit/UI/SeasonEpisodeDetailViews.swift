@@ -73,6 +73,7 @@ public struct SeasonDetailView: View {
                         if !detail.episodes.isEmpty {
                             let episodeNumbers = Set(detail.episodes.map(\.episodeNumber))
                             let watchedCount = watchedEpisodes.intersection(episodeNumbers).count
+                            let nextEpisode = detail.episodes.nextUnwatchedEpisode(watchedEpisodeNumbers: watchedEpisodes)
                             VStack(alignment: .leading, spacing: 10) {
                                 let progressLabel = String(
                                     format: String(localized: "Watched %d of %d", bundle: .module),
@@ -98,6 +99,20 @@ public struct SeasonDetailView: View {
                                     .frame(minHeight: 44)
                                 }
                                 .buttonStyle(.bordered)
+                                if let nextEpisode {
+                                    NavigationLink(value: EpisodeRoute(
+                                        series: route.series,
+                                        seasonNumber: detail.seasonNumber,
+                                        episode: nextEpisode
+                                    )) {
+                                        Label(
+                                            String(localized: "Continue with episode", bundle: .module),
+                                            systemImage: "play.fill"
+                                        )
+                                        .frame(minHeight: 44)
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                }
                             }
                             .padding(.vertical, 4)
                         }
