@@ -10,6 +10,7 @@ import type {
   TmdbCreditDetail,
   TmdbEpisode,
   TmdbFindResponse,
+  TmdbGenre,
   TmdbKeyword,
   TmdbPerson,
   TmdbSeason,
@@ -57,17 +58,21 @@ const entityKinds = new Set<EntityKind>([
 ]);
 const searchScopes = new Set<SearchScopeV2>(["all", "movie", "tv", "person", "collection", "company", "keyword"]);
 const relatedResources = new Set([
-  "credits", "images", "videos", "reviews", "recommendations", "similar", "translations",
+  "credits", "images", "videos", "reviews", "recommendations", "similar", "translations", "keywords",
   "release-information", "external-ids", "watch-providers",
 ]);
 
 export function routeV2(pathname: string): V2Route | null {
+  let match: RegExpMatchArray | null;
   if (pathname === "/v2/capabilities") return getRoute("v2-capabilities", 60, capabilities);
   if (pathname === "/v2/home") return getRoute("v2-home", 900, home);
   if (pathname === "/v2/search") return getRoute("v2-search", 300, search);
   if (pathname === "/v2/configuration") return getRoute("v2-configuration", 86400, configuration);
 
-  let match = pathname.match(/^\/v2\/discover\/(movie|tv)$/);
+  match = pathname.match(/^\/v2\/genres\/(movie|tv)$/);
+  if (match) return getRoute("v2-genres", 86400, (request, url, env, id) => genres(request, url, env, id, match![1] as MediaType));
+
+  match = pathname.match(/^\/v2\/discover\/(movie|tv)$/);
   if (match) return getRoute("v2-discover", 900, (request, url, env, id) => discover(request, url, env, id, match![1] as MediaType));
 
   match = pathname.match(/^\/v2\/trending\/(all|movie|tv|person)\/(day|week)$/);
@@ -339,6 +344,7 @@ async function titleRelated(
   rejectUnknown(url, allowed);
   const suffix = resource === "release-information"
     ? type === "movie" ? "release_dates" : "content_ratings"
+    : resource === "keywords" ? "keywords"
     : resource === "external-ids" ? "external_ids"
       : resource === "watch-providers" ? "watch/providers"
         : resource;
@@ -497,6 +503,28 @@ async function configuration(
       watch_providers: "JustWatch",
     },
   });
+}
+
+async function genres(
+  _request: Request,
+  url: URL,
+  env: WorkerEnvV2,
+  requestId: string,
+  type: MediaType,
+): Promise<Response> {
+  rejectUnknown(url, new Set(["language"]));
+  const result = await tmdb<{ genres?: TmdbGenre[] }>(
+    env,
+    `/genre/${type}/list`,
+    new URLSearchParams({ language: language(url) }),
+    requestId,
+  );
+  const values = (result.genres ?? []).flatMap((genre) => {
+    if (!Number.isSafeInteger(genre.id) || genre.id < 1) return [];
+    const name = typeof genre.name === "string" ? genre.name.trim() : "";
+    return name ? [{ id: genre.id, name }] : [];
+  });
+  return json({ media_type: type, genres: values });
 }
 
 interface TmdbWatchProvider {

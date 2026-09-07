@@ -32,6 +32,7 @@ type SchemaName =
   | "EpisodeDetail"
   | "ErrorEnvelope"
   | "FindResult"
+  | "GenreList"
   | "ListMutationResult"
   | "MutationResult"
   | "PersonDetail"
@@ -162,6 +163,41 @@ describe("v2 Worker contract", () => {
     expect(response.status).toBe(200);
     expectContract("EntityPage", value);
     expect(value.results.map((item) => item.entity_kind)).toEqual(["person", "movie", "collection"]);
+  });
+
+  it("loads the localized genre dictionary for each media type", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      expect(url.pathname).toBe("/3/genre/tv/list");
+      expect(url.searchParams.get("language")).toBe("vi-VN");
+      return Response.json({ genres: [
+        { id: 18, name: "Drama" },
+        { id: 10759, name: "Action & Adventure" },
+        { id: 0, name: "Invalid" },
+        { id: 99, name: "  " },
+      ] });
+    }));
+    const response = await worker.fetch(request("/v2/genres/tv?language=vi-VN"), env(), context);
+    const value = await response.json();
+    expect(response.status).toBe(200);
+    expectContract("GenreList", value);
+    expect(value).toEqual({ media_type: "tv", genres: [
+      { id: 18, name: "Drama" },
+      { id: 10759, name: "Action & Adventure" },
+    ] });
+  });
+
+  it("normalizes title keywords from both movie and tv TMDb envelopes", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => Response.json({
+      keywords: [{ id: 1, name: "hero" }, { id: 0, name: "invalid" }],
+      results: [{ id: 2, name: "  sequel  " }],
+    })));
+    const response = await worker.fetch(request("/v2/titles/movie/10/keywords?language=en-US"), env(), context);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ keywords: [
+      { id: 1, name: "hero" },
+      { id: 2, name: "sequel" },
+    ] });
   });
 
   it("finds mixed entities by an external ID and forwards the selected source", async () => {

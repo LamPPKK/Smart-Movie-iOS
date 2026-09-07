@@ -16,6 +16,11 @@ export type EntityKind =
 export type SearchScopeV2 = "all" | Exclude<EntityKind, "network" | "season" | "episode">;
 export type TimeWindow = "day" | "week";
 
+export interface TmdbGenre {
+  id: number;
+  name?: string;
+}
+
 export interface TmdbPerson {
   id: number;
   name?: string;

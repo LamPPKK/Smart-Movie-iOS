@@ -324,6 +324,17 @@ export function relatedResource(
       };
     case "translations":
       return { translations: (raw.translations as unknown[] | undefined) ?? [] };
+    case "keywords": {
+      const values = (raw.keywords as Array<{ id?: number; name?: string }> | undefined) ?? [];
+      const tvValues = (raw.results as Array<{ id?: number; name?: string }> | undefined) ?? [];
+      return {
+        keywords: [...values, ...tvValues].flatMap((value) =>
+          Number.isSafeInteger(value.id) && (value.id ?? 0) > 0 && typeof value.name === "string" && value.name.trim()
+            ? [{ id: value.id, name: value.name.trim() }]
+            : [],
+        ),
+      };
+    }
     case "release-information":
       return { results: (raw.results as unknown[] | undefined) ?? [] };
     default:
