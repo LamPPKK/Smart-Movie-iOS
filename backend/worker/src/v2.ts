@@ -171,6 +171,7 @@ async function capabilities(_request: Request, url: URL, env: WorkerEnvV2): Prom
       trending: true,
       external_id_search: true,
       companies_networks_keywords: true,
+      genres: true,
       advanced_discover: true,
       watch_providers: true,
     },
