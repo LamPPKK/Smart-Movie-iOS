@@ -364,6 +364,20 @@ final class APIClientTests: XCTestCase {
 }
 
 extension APIClientTests {
+    func testAccountDetailsUsesAuthenticatedAccountIDRoute() async throws {
+        let repository = RemoteAccountRepository(
+            client: makeClient(), tokenStore: MemorySessionTokenStore(token: "unit-test-opaque-session")
+        )
+        URLProtocolStub.reset()
+        URLProtocolStub.enqueue(status: 200, body: "{\"id\":42,\"username\":\"catalog-user\",\"name\":\"Catalog User\",\"language\":\"en\",\"country\":\"US\",\"include_adult\":false,\"avatar_path\":null,\"gravatar_hash\":null}")
+        let profile = try await repository.accountDetails(id: 42)
+        XCTAssertEqual(profile.id, 42)
+        let request = try XCTUnwrap(URLProtocolStub.requests.first)
+        XCTAssertEqual(request.httpMethod, "GET")
+        XCTAssertEqual(request.url?.path, "/api/v2/account/profile/42")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer unit-test-opaque-session")
+    }
+
     func testEpisodeAccountStateUsesAuthenticatedGETAndDecodesHalfStepOrUnrated() async throws {
         let repository = RemoteAccountRepository(
             client: makeClient(), tokenStore: MemorySessionTokenStore(token: "unit-test-opaque-session")

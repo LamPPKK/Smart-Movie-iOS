@@ -56,6 +56,8 @@ public protocol AccountRepository: AccountRecommendationsLoading, AccountListLoa
     func authAttempt(id: UUID, deviceCode: String?) async throws -> String
     func completeAuth(id: UUID, deviceCode: String?) async throws -> AuthSession
     func profile() async throws -> AccountProfile
+    /// Loads TMDb `/account/{account_id}` for the authenticated account.
+    func accountDetails(id: Int) async throws -> AccountProfile
     func accountState(mediaType: MediaType, id: Int) async throws -> AccountState
     func logout() async throws
     func library(
@@ -80,6 +82,12 @@ public protocol AccountRepository: AccountRecommendationsLoading, AccountListLoa
     func updateList(id: Int, name: String, description: String, isPublic: Bool, mutationID: UUID) async throws -> MutationResult
     func deleteList(id: Int, mutationID: UUID) async throws -> MutationResult
     func mutateListItems(id: Int, items: [UserListItemMutation], remove: Bool, mutationID: UUID) async throws -> MutationResult
+}
+
+public extension AccountRepository {
+    func accountDetails(id: Int) async throws -> AccountProfile {
+        try await profile()
+    }
 }
 
 public struct UserListItemMutation: Codable, Hashable, Sendable {

@@ -98,6 +98,11 @@ public actor RemoteAccountRepository: AccountRepository {
         try await client.get("v2/account/profile", headers: try await authorizationHeaders())
     }
 
+    public func accountDetails(id: Int) async throws -> AccountProfile {
+        guard id > 0 else { throw APIError.invalidResponse }
+        return try await client.get("v2/account/profile/\(id)", headers: try await authorizationHeaders())
+    }
+
     public func accountState(mediaType: MediaType, id: Int) async throws -> AccountState {
         try await client.get(
             "v2/account/state/\(mediaType.rawValue)/\(id)",
