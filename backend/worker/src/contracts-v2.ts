@@ -232,6 +232,7 @@ export interface TmdbTitleV2 extends TmdbTitle {
   content_ratings?: { results?: unknown[] };
   translations?: { translations?: unknown[] };
   "watch/providers"?: { results?: Record<string, TmdbProviderResult> };
+  keywords?: { keywords?: TmdbKeyword[]; results?: TmdbKeyword[] };
 }
 
 export interface CapabilitiesV2 {

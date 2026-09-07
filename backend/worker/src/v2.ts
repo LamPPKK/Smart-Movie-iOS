@@ -318,8 +318,8 @@ async function title(
   const locale = language(url);
   const adult = booleanQuery(url, "include_adult", false);
   const append = type === "movie"
-    ? "alternative_titles,credits,external_ids,images,videos,reviews,recommendations,similar,translations,release_dates,watch/providers"
-    : "alternative_titles,aggregate_credits,external_ids,images,videos,reviews,recommendations,similar,translations,content_ratings,watch/providers";
+    ? "alternative_titles,credits,external_ids,images,videos,reviews,recommendations,similar,translations,release_dates,watch/providers,keywords"
+    : "alternative_titles,aggregate_credits,external_ids,images,videos,reviews,recommendations,similar,translations,content_ratings,watch/providers,keywords";
   const parameters = new URLSearchParams({
     language: locale,
     append_to_response: append,

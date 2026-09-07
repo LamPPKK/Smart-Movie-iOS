@@ -139,6 +139,7 @@ export function titleDetailV2(item: TmdbTitleV2, type: MediaType, includeAdult =
     release_information: type === "movie" ? item.release_dates?.results ?? [] : item.content_ratings?.results ?? [],
     translations: item.translations?.translations ?? [],
     watch_providers: normalizeProviders(item["watch/providers"]?.results ?? {}),
+    keywords: normalizeKeywords(item.keywords),
   };
 }
 
@@ -361,6 +362,13 @@ function normalizeImages(value: { backdrops?: TmdbImage[]; posters?: TmdbImage[]
     posters: (value?.posters ?? []).map((item) => image(item, "poster")),
     logos: (value?.logos ?? []).map((item) => image(item, "logo")),
   };
+}
+
+function normalizeKeywords(value: TmdbTitleV2["keywords"]): Array<{ id: number; name: string }> {
+  return [...(value?.keywords ?? []), ...(value?.results ?? [])].flatMap((item) => {
+    const name = typeof item.name === "string" ? item.name.trim() : "";
+    return Number.isSafeInteger(item.id) && item.id > 0 && name ? [{ id: item.id, name }] : [];
+  }).filter((item, index, values) => values.findIndex((candidate) => candidate.id === item.id) === index);
 }
 
 function image(value: TmdbImage, kind: string) {

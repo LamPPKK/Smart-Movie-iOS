@@ -419,6 +419,7 @@ public struct TitleDetailV2: Codable, Sendable {
     public let releaseInformation: [ReleaseInformation]
     public let translations: [TitleTranslation]
     public let watchProviders: [ProviderRegion]
+    public let keywords: [KeywordSummary]?
 
     private enum CodingKeys: String, CodingKey {
         case id, mediaType, title, originalTitle, overview, posterPath, backdropPath, releaseDate, voteAverage
@@ -428,6 +429,7 @@ public struct TitleDetailV2: Codable, Sendable {
         case alternativeTitles
         case externalIDs = "externalIds"
         case images, videos, reviews, recommendations, similar, releaseInformation, translations, watchProviders
+        case keywords
     }
 
     public var summary: TitleSummary {
