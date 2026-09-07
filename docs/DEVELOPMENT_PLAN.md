@@ -26,6 +26,7 @@ Mục tiêu: biến source candidate hiện tại thành bản phát hành có t
 - Compact Detail đã sửa nhóm nút và metadata adaptive (29/08/2026): 7 render regression tests và capture iPhone ở cỡ chữ thường/Accessibility lớn nhất. Còn QA các hàng thông tin phía dưới (Status), sáu locale trên thiết bị, signed-in rating, VoiceOver/D-pad. Xem [bằng chứng và giới hạn](SCREENSHOTS.md).
 - Rating Apple đã có đủ 20 mức nửa điểm cho Movie/TV/Episode và Episode Detail đã đọc trạng thái account từ xa, ưu tiên mutation local còn pending, đồng thời loại phản hồi cũ khi reload/đổi account/đổi tập. Bước tiếp theo là QA signed-in trên thiết bị/TV với Worker staging thật. Xem [ma trận account state](TMDB_COVERAGE.md).
 - Bổ sung capture riêng Catalyst, visionOS, native desktop/JS và thiết bị Android/TV/Wear; không coi ảnh Web hoặc component golden là ảnh các nền tảng này.
+- Trending Day/Week cho Movie/TV đã có trên Apple, Android và KMP qua `/v2/trending`; tiếp tục theo dõi cache và capability trong QA staging.
 - Hoàn tất Apple signing, CloudKit production schema, App Store Connect metadata, privacy/support URL và ảnh store.
 - Hoàn tất Android signing, Play Internal Testing cho phone/tablet/TV/Wear, age rating, data safety và ảnh store.
 - Build candidate cho native macOS, Catalyst, visionOS, desktop JVM, JS và Wasm; xác nhận không có secret/session trong binary, log hoặc fixture.
