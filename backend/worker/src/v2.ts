@@ -259,13 +259,14 @@ async function search(_request: Request, url: URL, env: WorkerEnvV2, requestId: 
       tmdb<TmdbPage<Record<string, unknown>>>(env, "/search/collection", parameters, requestId),
     ]);
     const merged = [...multi.results, ...collections.results.map((item) => ({ ...item, media_type: "collection" }))];
+    const normalized = merged
+      .filter((item) => adult || (item as Record<string, unknown>).adult !== true)
+      .map((item) => searchEntity(item, item.media_type as EntityKind, adult))
+      .filter((item): item is NonNullable<typeof item> => item !== null);
     return json({
       page: pageNumber,
       total_pages: Math.min(Math.max(multi.total_pages, collections.total_pages), 500),
-      results: merged
-        .filter((item) => adult || (item as Record<string, unknown>).adult !== true)
-        .map((item) => searchEntity(item, item.media_type as EntityKind, adult))
-        .filter((item): item is NonNullable<typeof item> => item !== null),
+      results: [...new Map(normalized.map((item) => [`${item.entity_kind}:${item.id}`, item])).values()],
     });
   }
 

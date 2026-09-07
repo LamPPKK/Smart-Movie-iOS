@@ -156,6 +156,7 @@ describe("v2 Worker contract", () => {
       return Response.json({ page: 1, total_pages: 1, results: [
         { id: 1, media_type: "person", name: "Actor", known_for: [] },
         { id: 10, media_type: "movie", title: "Movie", original_title: "Movie", overview: "", genre_ids: [] },
+        { id: 2, media_type: "collection", name: "Saga", overview: "" },
       ] });
     }));
     const response = await worker.fetch(request("/v2/search?query=example&scope=all&language=en-US"), env(), context);
@@ -163,6 +164,7 @@ describe("v2 Worker contract", () => {
     expect(response.status).toBe(200);
     expectContract("EntityPage", value);
     expect(value.results.map((item) => item.entity_kind)).toEqual(["person", "movie", "collection"]);
+    expect(value.results).toHaveLength(3);
   });
 
   it("loads the localized genre dictionary for each media type", async () => {
