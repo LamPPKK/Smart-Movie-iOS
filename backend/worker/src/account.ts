@@ -77,6 +77,15 @@ export function routeAccountV2(pathname: string): V2Route | null {
   if (pathname === "/v2/account/profile") return privateRoute("v2-account-profile", GET, accountProfile);
   if (pathname === "/v2/account/lists") return privateRoute("v2-account-lists", GET_POST, accountLists);
 
+  let profileMatch = pathname.match(/^\/v2\/account\/profile\/(\d+)$/);
+  if (profileMatch) return privateRoute("v2-account-profile", GET, (request, url, env, id) => accountProfile(
+    request,
+    url,
+    env,
+    id,
+    titleID(profileMatch![1]),
+  ));
+
   let match = pathname.match(/^\/v2\/auth\/attempts\/([0-9a-f-]{36})$/i);
   if (match) return privateRoute("v2-auth-poll", GET, (request, url, env, id) => pollAuthAttempt(request, url, env, id, match![1]));
 
@@ -358,11 +367,21 @@ async function rotateCSRF(request: Request, url: URL, env: WorkerAccountEnv): Pr
   return privateJSON(request, env, { csrf_token: token });
 }
 
-async function accountProfile(request: Request, url: URL, env: WorkerAccountEnv, requestId: string): Promise<Response> {
+async function accountProfile(
+  request: Request,
+  url: URL,
+  env: WorkerAccountEnv,
+  requestId: string,
+  requestedAccountID?: number,
+): Promise<Response> {
   if (request.method === "OPTIONS") return preflight(request, env);
   rejectUnknown(url, new Set(["language"]));
   const session = await authorize(request, env);
-  const profile = await tmdb<Record<string, unknown>>(env, "/account", new URLSearchParams({ session_id: session.v3Session }), requestId);
+  if (requestedAccountID !== undefined && requestedAccountID !== session.row.account_id) {
+    throw new RequestProblem(404, "entity_not_found", "The requested account was not found.");
+  }
+  const endpoint = requestedAccountID === undefined ? "/account" : `/account/${requestedAccountID}`;
+  const profile = await tmdb<Record<string, unknown>>(env, endpoint, new URLSearchParams({ session_id: session.v3Session }), requestId);
   return privateJSON(request, env, normalizeProfile(profile));
 }
 

@@ -9,6 +9,36 @@ const context = { waitUntil: (promise: Promise<unknown>) => void promise };
 afterEach(() => vi.unstubAllGlobals());
 
 describe("v2 session broker security", () => {
+  it("loads TMDb account details through the authenticated account endpoint", async () => {
+    const bearer = "account-details-session";
+    const database = new SessionDatabase({
+      token_hash: await sha256(bearer), account_object_id: "fixture-account", account_id: 42,
+      access_token_encrypted: await encryptSecret("fixture-access", secret),
+      v3_session_encrypted: await encryptSecret("fixture-v3", secret), csrf_hash: "unused",
+      created_at: now() - 10, last_seen_at: now() - 10, expires_at: now() + 300, revoked_at: null,
+    });
+    const upstream = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      expect(url.pathname).toBe("/3/account/42");
+      expect(url.searchParams.get("session_id")).toBe("fixture-v3");
+      return Response.json({ id: 42, username: "catalog-user", name: "Catalog User", iso_639_1: "en", iso_3166_1: "US", include_adult: false, avatar: {} });
+    });
+    vi.stubGlobal("fetch", upstream);
+    const response = await worker.fetch(new Request("https://catalog.example/v2/account/profile/42", {
+      headers: { Authorization: `Bearer ${bearer}`, "X-SmartMovie-Client": "test" },
+    }), accountEnv(database), context);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    await expect(response.json()).resolves.toMatchObject({ id: 42, username: "catalog-user" });
+    expect(upstream).toHaveBeenCalledTimes(1);
+
+    const other = await worker.fetch(new Request("https://catalog.example/v2/account/profile/99", {
+      headers: { Authorization: `Bearer ${bearer}`, "X-SmartMovie-Client": "test" },
+    }), accountEnv(database), context);
+    expect(other.status).toBe(404);
+    expect(upstream).toHaveBeenCalledTimes(1);
+  });
+
   it.each(accountFixture.episode_states)("returns private canonical episode state for season $season_number", async (expected) => {
     const bearer = "fixture-episode-session";
     const database = new SessionDatabase({
