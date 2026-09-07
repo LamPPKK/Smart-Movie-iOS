@@ -180,6 +180,7 @@ async function capabilities(_request: Request, url: URL, env: WorkerEnvV2): Prom
       tv_qr_auth: accountReadiness.tvAuth,
       favorites: accountReadiness.account,
       watchlist: accountReadiness.account,
+      account_details: accountReadiness.account,
       ratings: accountReadiness.account,
       recommendations: accountReadiness.account,
       mixed_lists: accountReadiness.account,
