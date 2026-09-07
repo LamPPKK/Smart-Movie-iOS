@@ -191,7 +191,7 @@ Choose `SmartMovie`, `SmartMovieTV`, `SmartMovieVision`, `SmartMovieWatch`, or `
 
 ### Run the catalog Worker locally
 
-The apps never contain a TMDb credential. Debug uses `https://staging-catalog.smartmovie.app/` and Release uses `https://catalog.smartmovie.app/` after their Cloudflare DNS/TLS setup is complete.
+The Worker follows TMDb's [Getting Started guide](https://developer.themoviedb.org/docs/getting-started): it sends the server-side API Read Access Token as an `Authorization: Bearer` header, retrieves image configuration from TMDb, and builds artwork URLs from the returned `secure_base_url` and image paths. The apps never contain a TMDb credential. Debug uses `https://staging-catalog.smartmovie.app/` and Release uses `https://catalog.smartmovie.app/` after their Cloudflare DNS/TLS setup is complete.
 
 ```sh
 cd backend/worker
