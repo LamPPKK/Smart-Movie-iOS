@@ -41,6 +41,8 @@ The single cross-repository roadmap is [Kế hoạch phát triển Smart Movie s
 - **Build a local-first library** with independent Favorite and Watchlist actions. SwiftData keeps both readable offline; private CloudKit remains an Apple storage option.
 - **Move between Apple devices naturally** with five adaptive destinations, keyboard/pointer support, focus-driven TV navigation, multi-window Mac/visionOS details, and an Apple Watch companion that mirrors a safe title or exact episode and opens it back on iPhone.
 - **Track episode progress offline** by marking one episode or every listed episode in a season watched/unwatched. Season completion is visible at a glance; the additive SwiftData migration preserves existing Favorite and Watchlist rows, and progress is never sent to the SmartMovie Worker or TMDb.
+- **Continue from a season** by opening the first unwatched episode in order; the action is localized across all six supported locales.
+- **Explore Trending** with daily and weekly Movie/TV shelves backed by the shared `/v2/trending` contract.
 - **Explore trending titles** with daily and weekly Movie/TV shelves through the shared `/v2/trending` contract.
 - **Use the app in six languages**: English, Vietnamese, Japanese, Korean, Simplified Chinese, and Traditional Chinese.
 - **Use adaptive Detail controls**: actions and metadata switch from a row to a column when their full labels need more room; pill labels wrap instead of truncating. Dynamic Type, VoiceOver labels, Increase Contrast, Reduce Motion, and platform-native focus behavior remain part of the ongoing [accessibility QA](docs/SCREENSHOTS.md).
