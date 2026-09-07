@@ -51,6 +51,7 @@ public struct HomeView: View {
                 case .loaded(let feed):
                     if let hero = feed.hero { heroView(hero) }
                     ForEach(feed.sections) { section in shelf(section) }
+                    if !model.trending.isEmpty { shelf(HomeSection(id: "trending", title: String(localized: "Trending this week", bundle: .module), items: model.trending)) }
                 }
             }
             .padding(.vertical)
