@@ -8,7 +8,7 @@ public struct RemoteCatalogRepository: CatalogRepository {
     }
 
     public func home(mediaType: MediaType, language: String) async throws -> HomeFeed {
-        try await client.get("v1/home", queryItems: [
+        try await client.get("v2/home", queryItems: [
             URLQueryItem(name: "media_type", value: mediaType.rawValue),
             URLQueryItem(name: "language", value: language)
         ])
