@@ -113,6 +113,10 @@ final class ModelsTests: XCTestCase {
         )
         XCTAssertNil(container.imageURL(path: nil, kind: .backdrop))
         XCTAssertNil(container.imageURL(path: "", kind: .backdrop))
+        XCTAssertEqual(
+            container.imageURL(path: " https://image.tmdb.org/t/p/w500/poster.jpg ", kind: .poster)?.absoluteString,
+            "https://image.tmdb.org/t/p/w500/poster.jpg"
+        )
     }
 }
 

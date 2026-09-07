@@ -266,7 +266,13 @@ public final class AppContainer {
     }
 
     public func imageURL(path: String?, kind: ImageKind) -> URL? {
-        guard let path, !path.isEmpty else { return nil }
+        guard let rawPath = path?.trimmingCharacters(in: .whitespacesAndNewlines), !rawPath.isEmpty else { return nil }
+        // Preview servers and future Worker responses may provide an absolute
+        // image URL. Preserve it instead of incorrectly prefixing TMDb's CDN.
+        if let explicitURL = URL(string: rawPath),
+           let scheme = explicitURL.scheme?.lowercased(), scheme == "http" || scheme == "https" {
+            return explicitURL
+        }
         let size: String = switch kind {
         case .poster: preferredSize(imageConfiguration.posterSizes, candidates: ["w500", "w342"])
         case .backdrop: preferredSize(imageConfiguration.backdropSizes, candidates: ["w1280", "w780"])
@@ -275,7 +281,7 @@ public final class AppContainer {
         let base = imageConfiguration.secureBaseURL.hasSuffix("/")
             ? imageConfiguration.secureBaseURL
             : imageConfiguration.secureBaseURL + "/"
-        return URL(string: base + size + "/" + normalizedPath(path))
+        return URL(string: base + size + "/" + normalizedPath(rawPath))
     }
 
     public func isEpisodeWatched(_ key: EpisodeWatchKey) throws -> Bool {
