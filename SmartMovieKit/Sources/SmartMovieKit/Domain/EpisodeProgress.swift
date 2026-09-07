@@ -14,6 +14,16 @@ public struct EpisodeWatchKey: Hashable, Sendable {
     public var rawValue: String { "\(seriesID):\(seasonNumber):\(episodeNumber)" }
 }
 
+public extension Array where Element == EpisodeSummary {
+    /// Returns the first episode in air/episode order that has not been watched.
+    func nextUnwatchedEpisode(watchedEpisodeNumbers: Set<Int>) -> EpisodeSummary? {
+        sorted { lhs, rhs in
+            if lhs.seasonNumber != rhs.seasonNumber { return lhs.seasonNumber < rhs.seasonNumber }
+            return lhs.episodeNumber < rhs.episodeNumber
+        }.first { !watchedEpisodeNumbers.contains($0.episodeNumber) }
+    }
+}
+
 @MainActor
 public protocol EpisodeProgressRepository: AnyObject {
     func isWatched(_ key: EpisodeWatchKey) throws -> Bool
