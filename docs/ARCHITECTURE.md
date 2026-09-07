@@ -48,7 +48,7 @@ Adult opt-in and its six-digit PIN are local per device. Five failures lock the 
 
 - `CatalogRepository` retains Home, Genres, Discover, Search, Detail, and Configuration compatibility.
 - `CatalogRepositoryV2` adds capabilities, trending, discriminated entity search, deep title detail, Person, Collection, Company/Network, Keyword, Season, and Episode.
-- `AccountRepository` covers auth, profile/state, library, ratings, recommendations, and mixed-list CRUD/items.
+- `AccountRepository` covers auth, profile and authenticated TMDb Account Details, title/episode state, library, ratings, recommendations, and mixed-list CRUD/items.
 - `LibraryRepository` and account mutation outboxes own offline/merge/idempotency rules independently of UI.
 - `libraryKey` remains `{mediaType}:{tmdbID}`. Episode ratings use series/season/episode identity.
 
