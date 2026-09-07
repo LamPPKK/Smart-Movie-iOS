@@ -92,6 +92,57 @@ public struct EpisodeSummary: Codable, Hashable, Identifiable, Sendable {
     public let voteAverage: Double?
 
     public var episodeKey: String { "\(seriesId):\(seasonNumber):\(episodeNumber)" }
+
+    /// Source-compatible initializer for older Apple feature/test clients.
+    public init(
+        id: Int,
+        seriesID: Int,
+        seasonNumber: Int,
+        episodeNumber: Int,
+        name: String,
+        overview: String = "",
+        stillPath: String? = nil,
+        airDate: String? = nil,
+        runtimeMinutes: Int? = nil,
+        voteAverage: Double? = nil
+    ) {
+        self.id = id
+        self.seriesId = seriesID
+        self.seasonNumber = seasonNumber
+        self.episodeNumber = episodeNumber
+        self.name = name
+        self.overview = overview
+        self.stillPath = stillPath
+        self.airDate = airDate
+        self.runtimeMinutes = runtimeMinutes
+        self.voteAverage = voteAverage
+    }
+
+    public init(
+        id: Int,
+        seriesId: Int,
+        seasonNumber: Int,
+        episodeNumber: Int,
+        name: String,
+        overview: String = "",
+        stillPath: String? = nil,
+        airDate: String? = nil,
+        runtimeMinutes: Int? = nil,
+        voteAverage: Double? = nil
+    ) {
+        self.init(
+            id: id,
+            seriesID: seriesId,
+            seasonNumber: seasonNumber,
+            episodeNumber: episodeNumber,
+            name: name,
+            overview: overview,
+            stillPath: stillPath,
+            airDate: airDate,
+            runtimeMinutes: runtimeMinutes,
+            voteAverage: voteAverage
+        )
+    }
 }
 
 public enum CatalogEntity: Codable, Hashable, Identifiable, Sendable {

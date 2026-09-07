@@ -15,7 +15,7 @@ public struct RemoteCatalogRepository: CatalogRepository {
     }
 
     public func genres(mediaType: MediaType, language: String) async throws -> [Genre] {
-        let response: GenreResponse = try await client.get("v1/genres/\(mediaType.rawValue)", queryItems: [
+        let response: GenreResponse = try await client.get("v2/genres/\(mediaType.rawValue)", queryItems: [
             URLQueryItem(name: "language", value: language)
         ])
         return response.genres

@@ -139,6 +139,19 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(query["include_adult"], "true")
     }
 
+    func testRemoteRepositoryLoadsLocalizedGenresFromV2() async throws {
+        URLProtocolStub.enqueue(status: 200, body: #"{"media_type":"tv","genres":[{"id":18,"name":"Drama"}]}"#)
+        let repository = RemoteCatalogRepository(client: makeClient())
+
+        let genres = try await repository.genres(mediaType: .tv, language: "vi-VN")
+
+        XCTAssertEqual(genres.map(\.id), [18])
+        let request = try XCTUnwrap(URLProtocolStub.requests.first)
+        let url = try XCTUnwrap(request.url)
+        XCTAssertEqual(url.path, "/api/v2/genres/tv")
+        XCTAssertEqual(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first?.value, "vi-VN")
+    }
+
     func testBasicDiscoverFallsBackToV1AndOmitsAdvancedFields() async throws {
         URLProtocolStub.enqueue(status: 200, body: #"{"page":1,"total_pages":1,"results":[]}"#)
         let repository = RemoteCatalogRepository(client: makeClient())
