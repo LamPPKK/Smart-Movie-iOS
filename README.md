@@ -172,6 +172,12 @@ Run the read-only environment check first:
 ./scripts/doctor.sh
 ```
 
+Android and KMP use separate JDKs. Keep Android on JDK 17 and point `KMP_JAVA_HOME` to JDK 21 when running the doctor or KMP tasks:
+
+```bash
+JAVA_HOME=/path/to/jdk-17 KMP_JAVA_HOME=/path/to/jdk-21 ./scripts/doctor.sh
+```
+
 If macOS points at Command Line Tools instead of full Xcode, select the installed Xcode toolchain before building:
 
 ```sh
