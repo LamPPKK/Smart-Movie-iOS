@@ -179,6 +179,7 @@ async function capabilities(_request: Request, url: URL, env: WorkerEnvV2): Prom
       genres: true,
       advanced_discover: true,
       watch_providers: true,
+      certifications: true,
     },
     account: {
       browser_auth: accountReadiness.browserAuth,
