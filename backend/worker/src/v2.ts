@@ -69,6 +69,11 @@ export function routeV2(pathname: string): V2Route | null {
   if (pathname === "/v2/search") return getRoute("v2-search", 300, search);
   if (pathname === "/v2/configuration") return getRoute("v2-configuration", 86400, configuration);
 
+  match = pathname.match(/^\/v2\/certifications\/(movie|tv)$/);
+  if (match) return getRoute("v2-certifications", 86400, (request, url, env, id) => certifications(
+    request, url, env, id, match![1] as MediaType,
+  ));
+
   match = pathname.match(/^\/v2\/genres\/(movie|tv)$/);
   if (match) return getRoute("v2-genres", 86400, (request, url, env, id) => genres(request, url, env, id, match![1] as MediaType));
 
@@ -528,6 +533,31 @@ async function genres(
     return name ? [{ id: genre.id, name }] : [];
   });
   return json({ media_type: type, genres: values });
+}
+
+async function certifications(
+  _request: Request,
+  url: URL,
+  env: WorkerEnvV2,
+  requestId: string,
+  type: MediaType,
+): Promise<Response> {
+  rejectUnknown(url, new Set(["language"]));
+  const result = await tmdb<Record<string, Array<{ certification?: string; meaning?: string; order?: number }>>>(
+    env,
+    "/certification/movie/list".replace("movie", type),
+    new URLSearchParams({ language: language(url) }),
+    requestId,
+  );
+  const certifications = Object.fromEntries(Object.entries(result).map(([country, values]) => [
+    country,
+    (Array.isArray(values) ? values : []).flatMap((value) => {
+      const certification = typeof value.certification === "string" ? value.certification.trim() : "";
+      if (!certification) return [];
+      return [{ certification, meaning: typeof value.meaning === "string" ? value.meaning : "", order: Number.isSafeInteger(value.order) ? value.order : 0 }];
+    }),
+  ]));
+  return json({ media_type: type, certifications });
 }
 
 interface TmdbWatchProvider {
