@@ -25,6 +25,7 @@ type SchemaName =
   | "AuthAttempt"
   | "Capabilities"
   | "CollectionDetail"
+  | "CertificationList"
   | "Configuration"
   | "CreditDetail"
   | "CSRFToken"
@@ -187,6 +188,24 @@ describe("v2 Worker contract", () => {
       { id: 18, name: "Drama" },
       { id: 10759, name: "Action & Adventure" },
     ] });
+  });
+
+  it("loads and normalizes the localized certification dictionary", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      expect(url.pathname).toBe("/3/certification/movie/list");
+      return Response.json({ certifications: {
+        US: [{ certification: "R", meaning: "Restricted", order: 5 }, { certification: "", meaning: "bad", order: 9 }],
+        XX: "invalid",
+      } });
+    }));
+    const response = await worker.fetch(request("/v2/certifications/movie?language=en-US"), env(), context);
+    const value = await response.json();
+    expect(response.status).toBe(200);
+    expectContract("CertificationList", value);
+    expect(value).toEqual({ media_type: "movie", certifications: {
+      US: [{ certification: "R", meaning: "Restricted", order: 5 }], XX: [],
+    } });
   });
 
   it("normalizes title keywords from both movie and tv TMDb envelopes", async () => {

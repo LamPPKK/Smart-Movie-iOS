@@ -543,13 +543,13 @@ async function certifications(
   type: MediaType,
 ): Promise<Response> {
   rejectUnknown(url, new Set(["language"]));
-  const result = await tmdb<Record<string, Array<{ certification?: string; meaning?: string; order?: number }>>>(
+  const result = await tmdb<{ certifications?: Record<string, Array<{ certification?: string; meaning?: string; order?: number }>> }>(
     env,
     "/certification/movie/list".replace("movie", type),
     new URLSearchParams({ language: language(url) }),
     requestId,
   );
-  const certifications = Object.fromEntries(Object.entries(result).map(([country, values]) => [
+  const certifications = Object.fromEntries(Object.entries(result.certifications ?? {}).map(([country, values]) => [
     country,
     (Array.isArray(values) ? values : []).flatMap((value) => {
       const certification = typeof value.certification === "string" ? value.certification.trim() : "";
