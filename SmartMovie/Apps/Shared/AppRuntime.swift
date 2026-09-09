@@ -21,7 +21,9 @@ final class AppRuntime {
         modelContainer = persistentContainer
 
         let baseURL = Bundle.main.object(forInfoDictionaryKey: "CATALOG_BASE_URL") as? String
-        let serviceURL = URL(string: baseURL ?? "") ?? URL(string: "http://127.0.0.1:8787")!
+        // Release builds must remain usable even if a generated Info.plist omits
+        // the build setting. Debug keeps its local preview URL through the plist.
+        let serviceURL = URL(string: baseURL ?? "") ?? URL(string: "https://catalog.smartmovie.app/")!
         let client = APIClient(baseURL: serviceURL)
         let catalog = RemoteCatalogRepository(client: client)
         let account = RemoteAccountRepository(client: client)
